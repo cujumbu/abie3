@@ -83,14 +83,10 @@ const processCustomBlocks = (content) => {
     });
   });
 
-  // Process internal links in lists
-  processedContent = processedContent.replace(/^\s*-\s*\[([^\]]+)\]\((\/[^)]+)\)/gm, (match, text, path) => {
-    return `<li><a href="${path}" class="internal-link">${text}</a></li>`;
-  });
-
-  // Process plain internal links
-  processedContent = processedContent.replace(/\[([^\]]+)\]\((\/[^)]+)\)/g, (match, text, path) => {
-    return `<a href="${path}" class="internal-link">${text}</a>`;
+  // Process internal links in lists with proper formatting
+  processedContent = processedContent.replace(/^\s*-\s*\/([^\n]+)/gm, (match, path) => {
+    const title = path.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    return `<li><a href="/${path}" class="internal-link">${title}</a></li>`;
   });
 
   // Clean up any remaining pre/code tags around components
@@ -103,6 +99,16 @@ const processCustomBlocks = (content) => {
       return content.trim();
     }
     return match;
+  });
+
+  // Process external links
+  processedContent = processedContent.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, (match, text, url) => {
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="external-link">${text}</a>`;
+  });
+
+  // Process internal links (must come after external links)
+  processedContent = processedContent.replace(/\[([^\]]+)\]\(\/([^)]+)\)/g, (match, text, path) => {
+    return `<a href="/${path}" class="internal-link">${text}</a>`;
   });
 
   return processedContent;
@@ -152,7 +158,10 @@ export const generatePageContent = async (path) => {
            Feature 2: Description
            Feature 3: Description
            :::
-        7. CRITICAL: All internal links MUST start with / (e.g., /topic-name)`
+        7. For related topics, simply list them with leading slashes:
+           /topic-one
+           /topic-two
+           /topic-three`
       },
       {
         role: "user",
