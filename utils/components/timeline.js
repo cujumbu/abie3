@@ -6,8 +6,10 @@ export const createTimeline = (events) => {
         <div class="font-bold text-xl text-blue-600">${event.year}</div>
         <div class="mt-2 text-gray-700">${event.description}</div>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('\n');
 
-  return `<div class="timeline-container">${timelineItems}</div>`;
+  return `
+    <div class="timeline-container">
+      ${timelineItems}
+    </div>`;
 };
