@@ -24,6 +24,25 @@ const processMarkdownLinks = (content) => {
   });
 };
 
+const processRelatedTopics = (content) => {
+  return content.replace(
+    /(### Related Topics|## Related Topics)\s*\n((?:\/[a-z0-9-]+(?:\s*\n|$))+)/gm,
+    (match, heading, topics) => {
+      const topicLinks = topics
+        .trim()
+        .split('\n')
+        .map(topic => {
+          const path = topic.trim();
+          const title = path.substring(1).replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          return `<li><a href="${path}" class="internal-link">${title}</a></li>`;
+        })
+        .join('\n');
+
+      return `${heading}\n<ul>\n${topicLinks}\n</ul>`;
+    }
+  );
+};
+
 const processCustomBlocks = (content) => {
   let processedContent = content;
 
@@ -105,17 +124,8 @@ const processCustomBlocks = (content) => {
     return `<a href="/${path}" class="internal-link">${text}</a>`;
   });
 
-  // Process plain path links in Related Topics section
-  processedContent = processedContent.replace(/^(\/[a-z0-9-]+)$/gm, (match, path) => {
-    const title = path.substring(1).replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    return `<li><a href="${path}" class="internal-link">${title}</a></li>`;
-  });
-
-  // Wrap related topics in ul if not already wrapped
-  processedContent = processedContent.replace(
-    /(<h2>Related Topics<\/h2>\s*)<p>((?:<li><a.*?<\/a><\/li>\s*)+)<\/p>/s,
-    '$1<ul>$2</ul>'
-  );
+  // Process related topics section
+  processedContent = processRelatedTopics(processedContent);
 
   return processedContent;
 };
