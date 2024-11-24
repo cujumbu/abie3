@@ -83,12 +83,6 @@ const processCustomBlocks = (content) => {
     });
   });
 
-  // Process internal links in lists with proper formatting
-  processedContent = processedContent.replace(/^\s*-\s*\/([^\n]+)/gm, (match, path) => {
-    const title = path.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    return `<li><a href="/${path}" class="internal-link">${title}</a></li>`;
-  });
-
   // Clean up any remaining pre/code tags around components
   processedContent = processedContent.replace(/<pre><code[^>]*>([\s\S]*?)<\/code><\/pre>/g, (match, content) => {
     if (content.includes('timeline-container') || 
@@ -110,6 +104,18 @@ const processCustomBlocks = (content) => {
   processedContent = processedContent.replace(/\[([^\]]+)\]\(\/([^)]+)\)/g, (match, text, path) => {
     return `<a href="/${path}" class="internal-link">${text}</a>`;
   });
+
+  // Process plain path links in Related Topics section
+  processedContent = processedContent.replace(/^(\/[a-z0-9-]+)$/gm, (match, path) => {
+    const title = path.substring(1).replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    return `<li><a href="${path}" class="internal-link">${title}</a></li>`;
+  });
+
+  // Wrap related topics in ul if not already wrapped
+  processedContent = processedContent.replace(
+    /(<h2>Related Topics<\/h2>\s*)<p>((?:<li><a.*?<\/a><\/li>\s*)+)<\/p>/s,
+    '$1<ul>$2</ul>'
+  );
 
   return processedContent;
 };
@@ -158,7 +164,7 @@ export const generatePageContent = async (path) => {
            Feature 2: Description
            Feature 3: Description
            :::
-        7. For related topics, simply list them with leading slashes:
+        7. For related topics, list each topic on a new line with a leading slash:
            /topic-one
            /topic-two
            /topic-three`
