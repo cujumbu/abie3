@@ -5,6 +5,7 @@ import { createStats } from './components/stats.js';
 import { createQuiz } from './components/quiz.js';
 import { createChart } from './components/chart.js';
 import { createFeatures } from './components/features.js';
+import { createTimeline } from './components/timeline.js';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -34,66 +35,60 @@ const processCustomBlocks = (content) => {
 
   let processedContent = content;
 
-  // Process timeline blocks differently to avoid pre/code wrapping
-  processedContent = processedContent.replace(patterns.timeline, (match, timelineContent) => {
-    const events = timelineContent.trim().split('\n').map(line => {
-      const [year, ...description] = line.split(' - ');
-      return {
-        year: year.trim(),
-        description: description.join(' - ').trim()
-      };
+  // Process each custom block
+  Object.entries(patterns).forEach(([type, pattern]) => {
+    processedContent = processedContent.replace(pattern, (match, content) => {
+      const cleanContent = content.trim();
+      switch (type) {
+        case 'timeline':
+          const events = cleanContent.split('\n').map(line => {
+            const [year, ...description] = line.split(' - ');
+            return {
+              year: year.trim(),
+              description: description.join(' - ').trim()
+            };
+          });
+          return createTimeline(events);
+        case 'stats':
+          const stats = cleanContent.split('\n').map(line => {
+            const [label, value] = line.split(':').map(s => s.trim());
+            return { label, value };
+          });
+          return createStats(stats);
+        case 'quiz':
+          const lines = cleanContent.split('\n');
+          const question = lines[0];
+          const options = lines.slice(1).map(line => {
+            const isCorrect = line.startsWith('*- ');
+            const text = line.replace(/^\*?- /, '').trim();
+            return { text, isCorrect };
+          });
+          return createQuiz(question, options);
+        case 'chart':
+          const chartLines = cleanContent.split('\n');
+          const title = chartLines[0];
+          const data = chartLines.slice(1).map(line => {
+            const [label, value] = line.split('|').map(s => s.trim());
+            return { label, value: parseFloat(value) };
+          });
+          return createChart(title, data);
+        case 'features':
+          const features = cleanContent.split('\n').map(f => f.trim());
+          return createFeatures(features);
+        default:
+          return match;
+      }
     });
-    
-    const timelineItems = events.map(event => `
-      <div class="timeline-item">
-        <div class="timeline-dot"></div>
-        <div class="timeline-content">
-          <div class="font-bold text-xl text-blue-600">${event.year}</div>
-          <div class="mt-2 text-gray-700">${event.description}</div>
-        </div>
-      </div>
-    `).join('');
-
-    return `<div class="timeline-container">${timelineItems}</div>`;
   });
 
-  // Process other custom blocks
-  Object.entries(patterns).forEach(([type, pattern]) => {
-    if (type !== 'timeline') {
-      processedContent = processedContent.replace(pattern, (match, content) => {
-        const cleanContent = content.trim();
-        switch (type) {
-          case 'stats':
-            const stats = cleanContent.split('\n').map(line => {
-              const [label, value] = line.split(':').map(s => s.trim());
-              return { label, value };
-            });
-            return createStats(stats);
-          case 'quiz':
-            const lines = cleanContent.split('\n');
-            const question = lines[0];
-            const options = lines.slice(1).map(line => {
-              const isCorrect = line.startsWith('*- ');
-              const text = line.replace(/^\*?- /, '').trim();
-              return { text, isCorrect };
-            });
-            return createQuiz(question, options);
-          case 'chart':
-            const chartLines = cleanContent.split('\n');
-            const title = chartLines[0];
-            const data = chartLines.slice(1).map(line => {
-              const [label, value] = line.split('|').map(s => s.trim());
-              return { label, value: parseFloat(value) };
-            });
-            return createChart(title, data);
-          case 'features':
-            const features = cleanContent.split('\n').map(f => f.trim());
-            return createFeatures(features);
-          default:
-            return match;
-        }
-      });
-    }
+  // Process internal links in lists
+  processedContent = processedContent.replace(/^\s*-\s*\[([^\]]+)\]\((\/[^)]+)\)/gm, (match, text, path) => {
+    return `<li><a href="${path}" class="internal-link">${text}</a></li>`;
+  });
+
+  // Process plain internal links
+  processedContent = processedContent.replace(/\[([^\]]+)\]\((\/[^)]+)\)/g, (match, text, path) => {
+    return `<a href="${path}" class="internal-link">${text}</a>`;
   });
 
   return processedContent;
