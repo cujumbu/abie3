@@ -6,6 +6,7 @@ import { createQuiz } from './components/quiz.js';
 import { createChart } from './components/chart.js';
 import { createFeatures } from './components/features.js';
 import { createTimeline } from './components/timeline.js';
+import { siteContext } from '../config/siteContext.js';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -24,6 +25,16 @@ const processMarkdownLinks = (content) => {
   });
 };
 
+const isTopicInScope = (topic) => {
+  if (!siteContext.relatedTopicsScope.length) return true;
+  
+  const normalizedTopic = topic.toLowerCase();
+  return siteContext.relatedTopicsScope.some(scopeTopic => 
+    normalizedTopic.includes(scopeTopic) || 
+    scopeTopic.includes(normalizedTopic)
+  );
+};
+
 const processRelatedTopics = (content) => {
   // First pattern: Markdown list of paths
   content = content.replace(
@@ -35,11 +46,13 @@ const processRelatedTopics = (content) => {
         .map(topic => {
           const path = topic.replace(/^[-*]\s*/, '').trim();
           const title = path.substring(1).replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          if (!isTopicInScope(title)) return null;
           return `<li><a href="${path}" class="internal-link">${title}</a></li>`;
         })
+        .filter(Boolean)
         .join('\n');
 
-      return `## Related Topics\n<ul>\n${topicLinks}\n</ul>`;
+      return topicLinks ? `## Related Topics\n<ul>\n${topicLinks}\n</ul>` : '';
     }
   );
 
@@ -55,11 +68,13 @@ const processRelatedTopics = (content) => {
         .map(topic => {
           const path = topic.trim();
           const title = path.substring(1).replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          if (!isTopicInScope(title)) return null;
           return `<li><a href="${path}" class="internal-link">${title}</a></li>`;
         })
+        .filter(Boolean)
         .join('\n');
 
-      return `## Related Topics\n<ul>\n${topicLinks}\n</ul>`;
+      return topicLinks ? `## Related Topics\n<ul>\n${topicLinks}\n</ul>` : '';
     }
   );
 
@@ -168,7 +183,7 @@ export const generatePageContent = async (path) => {
     messages: [
       {
         role: "system",
-        content: `${getRandomPrompt()}\n\nAdditional formatting guidelines:
+        content: `${getRandomPrompt()}\n\n${siteContext.context}\n\nAdditional formatting guidelines:
         1. Use proper markdown headers (# for main title, ## for sections)
         2. For timelines, use format: :::timeline:::
            YYYY - Event description
@@ -201,12 +216,14 @@ export const generatePageContent = async (path) => {
            ## Related Topics
            - /topic-one
            - /topic-two
-           - /topic-three`
+           - /topic-three
+           
+        Important: Keep all content and related topics within the context of ${siteContext.mainTopic}.`
       },
       {
         role: "user",
-        content: `Create engaging content about: ${topic}. 
-        ${wikiData.extract ? `Include these verified facts: ${wikiData.extract}` : ''}`
+        content: `Create engaging content about: ${topic} in the context of ${siteContext.mainTopic}. 
+        ${wikiData.extract ? `Include these verified facts where relevant to ${siteContext.mainTopic}: ${wikiData.extract}` : ''}`
       }
     ],
     max_tokens: 12000,
