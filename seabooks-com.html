@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeaBooks | Your Complete Maritime Knowledge Hub</title>
+    <meta name="description" content="Explore the world's most comprehensive collection of maritime literature, research, and historical documents">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Core Animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Scrollspy Navigation */
+        .side-nav {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            z-index: 50;
+        }
+
+        .side-nav-item {
+            width: 10px;
+            height: 10px;
+            margin: 10px 0;
+            background-color: rgba(59, 130, 246, 0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .side-nav-item.active {
+            background-color: rgb(59, 130, 246);
+            transform: scale(1.5);
+        }
+
+        /* Section Styles */
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, rgb(59, 130, 246), transparent);
+            margin: 2rem 0;
+        }
+
+        .content-card {
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Timeline Navigation */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 100%;
+            background: rgb(59, 130, 246);
+        }
+
+        /* Map Navigation */
+        .region-map {
+            position: relative;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        /* Category Pills */
+        .category-pill {
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            background: rgba(59, 130, 246, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .category-pill:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <!-- Fixed Side Navigation -->
+    <nav class="side-nav hidden lg:block">
+        <div class="side-nav-item active" data-section="hero"></div>
+        <div class="side-nav-item" data-section="eras"></div>
+        <div class="side-nav-item" data-section="regions"></div>
+        <div class="side-nav-item" data-section="vessels"></div>
+        <div class="side-nav-item" data-section="research"></div>
+    </nav>
+
+    <!-- Main Navigation -->
+    <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-lg shadow-sm z-40">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-20">
+                <!-- Logo -->
+                <a href="/" class="flex items-center space-x-2">
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
+                    </svg>
+                    <span class="text-3xl font-bold text-blue-600">SeaBooks</span>
+                </a>
+
+                <!-- Primary Navigation -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="/topics/historical-maritime" class="text-gray-600 hover:text-blue-600 transition">Historical</a>
+                    <a href="/topics/modern-navigation" class="text-gray-600 hover:text-blue-600 transition">Navigation</a>
+                    <a href="/topics/marine-research" class="text-gray-600 hover:text-blue-600 transition">Research</a>
+                    <a href="/topics/maritime-technology" class="text-gray-600 hover:text-blue-600 transition">Technology</a>
+                    <a href="/topics/naval-engineering" class="text-gray-600 hover:text-blue-600 transition">Engineering</a>
+                </div>
+
+                <!-- Quick Access -->
+                <div class="flex items-center space-x-4">
+                    <a href="/collections/featured" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Featured Collections</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="pt-32 pb-20 bg-gradient-to-b from-blue-50 to-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                    Navigate the Ocean of Knowledge
+                </h1>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Explore the world's most comprehensive maritime library spanning centuries of seafaring history, navigation, and marine science.
+                </p>
+            </div>
+
+            <!-- Quick Access Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <a href="/categories/naval-history" class="content-card p-6 rounded-xl bg-white text-center">
+                    <div class="text-4xl mb-2">⚓</div>
+                    <h3 class="font-semibold">Naval History</h3>
+                </a>
+                <a href="/categories/navigation-systems" class="content-card p-6 rounded-xl bg-white text-center">
+                    <div class="text-4xl mb-2">🧭</div>
+                    <h3 class="font-semibold">Navigation</h3>
+                </a>
+                <a href="/categories/marine-biology" class="content-card p-6 rounded-xl bg-white text-center">
+                    <div class="text-4xl mb-2">🌊</div>
+                    <h3 class="font-semibold">Marine Science</h3>
+                </a>
+                <a href="/categories/maritime-law" class="content-card p-6 rounded-xl bg-white text-center">
+                    <div class="text-4xl mb-2">⚖️</div>
+                    <h3 class="font-semibold">Maritime Law</h3>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Historical Eras Section -->
+    <section id="eras" class="py-20">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16">Historical Eras</h2>
+            <div class="timeline mb-12">
+                <div class="grid md:grid-cols-4 gap-8">
+                    <a href="/eras/ancient-maritime" class="content-card p-6 rounded-xl bg-white">
+                        <h3 class="text-xl font-bold mb-3">Ancient Maritime</h3>
+                        <p class="text-gray-600 text-sm">3000 BCE - 476 CE</p>
+                    </a>
+                    <a href="/eras/middle-ages-maritime" class="content-card p-6 rounded-xl bg-white">
+                        <h3 class="text-xl font-bold mb-3">Middle Ages</h3>
+                        <p class="text-gray-600 text-sm">476 - 1453</p>
+                    </a>
+                    <a href="/eras/age-of-sail" class="content-card p-6 rounded-xl bg-white">
+                        <h3 class="text-xl font-bold mb-3">Age of Sail</h3>
+                        <p class="text-gray-600 text-sm">1571 - 1862</p>
+                    </a>
+                    <a href="/eras/modern-maritime" class="content-card p-6 rounded-xl bg-white">
+                        <h3 class="text-xl font-bold mb-3">Modern Era</h3>
+                        <p class="text-gray-600 text-sm">1862 - Present</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Maritime Regions -->
+    <section id="regions" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16">Maritime Regions</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Pacific -->
+                <div class="region-map p-6">
+                    <h3 class="text-2xl font-bold mb-4">Pacific Maritime</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/regions/pacific/polynesian-navigation" class="text-blue-600 hover:text-blue-800">Polynesian Navigation</a></li>
+                        <li><a href="/regions/pacific/asian-maritime-routes" class="text-blue-600 hover:text-blue-800">Asian Maritime Routes</a></li>
+                        <li><a href="/regions/pacific/west-coast-shipping" class="text-blue-600 hover:text-blue-800">West Coast Shipping</a></li>
+                    </ul>
+                </div>
+
+                <!-- Atlantic -->
+                <div class="region-map p-6">
+                    <h3 class="text-2xl font-bold mb-4">Atlantic Maritime</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/regions/atlantic/european-trade-routes" class="text-blue-600 hover:text-blue-800">European Trade Routes</a></li>
+                        <li><a href="/regions/atlantic/caribbean-navigation" class="text-blue-600 hover:text-blue-800">Caribbean Navigation</a></li>
+                        <li><a href="/regions/atlantic/north-atlantic-passages" class="text-blue-600 hover:text-blue-800">North Atlantic Passages</a></li>
+                    </ul>
+                </div>
+
+                <!-- Mediterranean -->
+                <div class="region-map p-6">
+                    <h3 class="text-2xl font-bold mb-4">Mediterranean</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/regions/mediterranean/ancient-routes" class="text-blue-600 hover:text-blue-800">Ancient Routes</a></li>
+                        <li><a href="/regions/mediterranean/venetian-maritime" class="text-blue-600 hover:text-blue-800">Venetian Maritime</a></li>
+                        <li><a href="/regions/mediterranean/modern-shipping" class="text-blue-600 hover:text-blue-800">Modern Shipping</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vessel Types -->
+    <section id="vessels" class="py-20">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16">Vessel Types</h2>
+            <div class="grid md:grid-cols-4 gap-8">
+                <a href="/vessels/military-vessels" class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-xl font-bold mb-3">Military Vessels</h3>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>Battleships</li>
+                        <li>Submarines</li>
+                        <li>Aircraft Carriers</li>
+                    </ul>
+                </a>
+                <a href="/vessels/merchant-ships" class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-xl font-bold mb-3">Merchant Ships</h3>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>Cargo Vessels</li>
+                        <li>Container Ships</li>
+                        <li>Tankers</li>
+                    </ul>
+                </a>
+                <a href="/vessels/sailing-vessels" class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-xl font-bold mb-3">Sailing Vessels</h3>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>Galleons</li>
+                        <li>Clippers</li>
+                        <li>Schooners</li>
+                    </ul>
+                </a>
+                <a href="/vessels/specialized-craft" class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-xl font-bold mb-3">Specialized Craft</h3>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>Research Vessels</li>
+                        <li>Survey Ships</li>
+                        <li>Ice Breakers</li>
+                    </ul>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Maritime Research -->
+    <section id="research" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16">Maritime Research</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Marine Science -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-2xl font-bold mb-4">Marine Science</h3>
+                    <ul class="space-y-3">
+                        <li><a href="/research/marine-science/oceanography" class="hover:text-blue-600 transition">Oceanographic Studies</a></li>
+                        <li><a href="/research/marine-science/biology" class="hover:text-blue-600 transition">Marine Biology</a></li>
+                        <li><a href="/research/marine-science/conservation" class="hover:text-blue-600 transition">Ocean Conservation</a></li>
+                        <li><a href="/research/marine-science/climate" class="hover:text-blue-600 transition">Climate Impact Studies</a></li>
+                    </ul>
+                </div>
+
+                <!-- Navigation Technology -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-2xl font-bold mb-4">Navigation Technology</h3>
+                    <ul class="space-y-3">
+                        <li><a href="/research/navigation/modern-systems" class="hover:text-blue-600 transition">Modern Navigation Systems</a></li>
+                        <li><a href="/research/navigation/gps-development" class="hover:text-blue-600 transition">GPS Technology</a></li>
+                        <li><a href="/research/navigation/electronic-charts" class="hover:text-blue-600 transition">Electronic Charts</a></li>
+                        <li><a href="/research/navigation/future-tech" class="hover:text-blue-600 transition">Future Technologies</a></li>
+                    </ul>
+                </div>
+
+                <!-- Maritime Engineering -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-2xl font-bold mb-4">Maritime Engineering</h3>
+                    <ul class="space-y-3">
+                        <li><a href="/research/engineering/ship-design" class="hover:text-blue-600 transition">Ship Design</a></li>
+                        <li><a href="/research/engineering/propulsion" class="hover:text-blue-600 transition">Propulsion Systems</a></li>
+                        <li><a href="/research/engineering/green-tech" class="hover:text-blue-600 transition">Green Technologies</a></li>
+                        <li><a href="/research/engineering/automation" class="hover:text-blue-600 transition">Maritime Automation</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Documentation -->
+    <section id="technical" class="py-20">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16">Technical Documentation</h2>
+            <div class="grid md:grid-cols-4 gap-8">
+                <!-- Safety Protocols -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-xl font-bold mb-4">Safety Protocols</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/technical/safety/emergency-procedures" class="text-blue-600 hover:text-blue-800">Emergency Procedures</a></li>
+                        <li><a href="/technical/safety/equipment-standards" class="text-blue-600 hover:text-blue-800">Equipment Standards</a></li>
+                        <li><a href="/technical/safety/crew-guidelines" class="text-blue-600 hover:text-blue-800">Crew Guidelines</a></li>
+                    </ul>
+                </div>
+
+                <!-- Navigation Manuals -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-xl font-bold mb-4">Navigation Manuals</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/technical/navigation/radar-systems" class="text-blue-600 hover:text-blue-800">Radar Systems</a></li>
+                        <li><a href="/technical/navigation/chart-plotting" class="text-blue-600 hover:text-blue-800">Chart Plotting</a></li>
+                        <li><a href="/technical/navigation/weather-routing" class="text-blue-600 hover:text-blue-800">Weather Routing</a></li>
+                    </ul>
+                </div>
+
+                <!-- Engineering Specs -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-xl font-bold mb-4">Engineering Specs</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/technical/engineering/vessel-designs" class="text-blue-600 hover:text-blue-800">Vessel Designs</a></li>
+                        <li><a href="/technical/engineering/engine-systems" class="text-blue-600 hover:text-blue-800">Engine Systems</a></li>
+                        <li><a href="/technical/engineering/maintenance" class="text-blue-600 hover:text-blue-800">Maintenance Guides</a></li>
+                    </ul>
+                </div>
+
+                <!-- Regulatory Documents -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-xl font-bold mb-4">Regulatory Docs</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/technical/regulatory/international-laws" class="text-blue-600 hover:text-blue-800">International Laws</a></li>
+                        <li><a href="/technical/regulatory/compliance" class="text-blue-600 hover:text-blue-800">Compliance Guides</a></li>
+                        <li><a href="/technical/regulatory/certifications" class="text-blue-600 hover:text-blue-800">Certifications</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Educational Resources -->
+    <section id="education" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16">Educational Resources</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Training Programs -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-2xl font-bold mb-4">Training Programs</h3>
+                    <ul class="space-y-3">
+                        <li><a href="/education/training/navigation-basics" class="hover:text-blue-600">Navigation Basics</a></li>
+                        <li><a href="/education/training/safety-courses" class="hover:text-blue-600">Safety Courses</a></li>
+                        <li><a href="/education/training/engineering-fundamentals" class="hover:text-blue-600">Engineering Fundamentals</a></li>
+                    </ul>
+                </div>
+
+                <!-- Certification Courses -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-2xl font-bold mb-4">Certification Courses</h3>
+                    <ul class="space-y-3">
+                        <li><a href="/education/certification/officer-training" class="hover:text-blue-600">Officer Training</a></li>
+                        <li><a href="/education/certification/engineering-certs" class="hover:text-blue-600">Engineering Certificates</a></li>
+                        <li><a href="/education/certification/safety-management" class="hover:text-blue-600">Safety Management</a></li>
+                    </ul>
+                </div>
+
+                <!-- Academic Resources -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-2xl font-bold mb-4">Academic Resources</h3>
+                    <ul class="space-y-3">
+                        <li><a href="/education/academic/marine-biology" class="hover:text-blue-600">Marine Biology</a></li>
+                        <li><a href="/education/academic/naval-architecture" class="hover:text-blue-600">Naval Architecture</a></li>
+                        <li><a href="/education/academic/maritime-law" class="hover:text-blue-600">Maritime Law</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="industry" class="py-20">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16">Industry Collections</h2>
+            <div class="grid md:grid-cols-4 gap-8">
+                <!-- Commercial Shipping -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-xl font-bold mb-4">Commercial Shipping</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/industry/commercial/cargo-operations" class="text-blue-600 hover:text-blue-800">Cargo Operations</a></li>
+                        <li><a href="/industry/commercial/fleet-management" class="text-blue-600 hover:text-blue-800">Fleet Management</a></li>
+                        <li><a href="/industry/commercial/logistics" class="text-blue-600 hover:text-blue-800">Maritime Logistics</a></li>
+                        <li><a href="/industry/commercial/port-operations" class="text-blue-600 hover:text-blue-800">Port Operations</a></li>
+                    </ul>
+                </div>
+
+                <!-- Naval Operations -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-xl font-bold mb-4">Naval Operations</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/industry/naval/fleet-tactics" class="text-blue-600 hover:text-blue-800">Fleet Tactics</a></li>
+                        <li><a href="/industry/naval/submarine-ops" class="text-blue-600 hover:text-blue-800">Submarine Operations</a></li>
+                        <li><a href="/industry/naval/carrier-groups" class="text-blue-600 hover:text-blue-800">Carrier Groups</a></li>
+                        <li><a href="/industry/naval/coastal-defense" class="text-blue-600 hover:text-blue-800">Coastal Defense</a></li>
+                    </ul>
+                </div>
+
+                <!-- Offshore Industry -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-xl font-bold mb-4">Offshore Industry</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/industry/offshore/oil-gas" class="text-blue-600 hover:text-blue-800">Oil & Gas</a></li>
+                        <li><a href="/industry/offshore/wind-power" class="text-blue-600 hover:text-blue-800">Wind Power</a></li>
+                        <li><a href="/industry/offshore/subsea-operations" class="text-blue-600 hover:text-blue-800">Subsea Operations</a></li>
+                        <li><a href="/industry/offshore/platform-management" class="text-blue-600 hover:text-blue-800">Platform Management</a></li>
+                    </ul>
+                </div>
+
+                <!-- Marine Services -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-xl font-bold mb-4">Marine Services</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/industry/services/salvage" class="text-blue-600 hover:text-blue-800">Maritime Salvage</a></li>
+                        <li><a href="/industry/services/surveying" class="text-blue-600 hover:text-blue-800">Marine Surveying</a></li>
+                        <li><a href="/industry/services/pilotage" class="text-blue-600 hover:text-blue-800">Harbor Pilotage</a></li>
+                        <li><a href="/industry/services/vessel-maintenance" class="text-blue-600 hover:text-blue-800">Vessel Maintenance</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Maritime Technology -->
+    <section id="technology" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16">Maritime Technology</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Navigation Systems -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-2xl font-bold mb-4">Navigation Systems</h3>
+                    <ul class="space-y-3">
+                        <li><a href="/technology/navigation/integrated-bridge" class="hover:text-blue-600">Integrated Bridge Systems</a></li>
+                        <li><a href="/technology/navigation/electronic-charts" class="hover:text-blue-600">Electronic Chart Systems</a></li>
+                        <li><a href="/technology/navigation/radar-technology" class="hover:text-blue-600">Radar Technology</a></li>
+                        <li><a href="/technology/navigation/satellite-systems" class="hover:text-blue-600">Satellite Navigation</a></li>
+                    </ul>
+                </div>
+
+                <!-- Communication Systems -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-2xl font-bold mb-4">Communication Systems</h3>
+                    <ul class="space-y-3">
+                        <li><a href="/technology/communication/satellite-comms" class="hover:text-blue-600">Satellite Communications</a></li>
+                        <li><a href="/technology/communication/vhf-systems" class="hover:text-blue-600">VHF Systems</a></li>
+                        <li><a href="/technology/communication/gmdss" class="hover:text-blue-600">GMDSS Equipment</a></li>
+                        <li><a href="/technology/communication/internal-comms" class="hover:text-blue-600">Internal Communications</a></li>
+                    </ul>
+                </div>
+
+                <!-- Automation & Control -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-2xl font-bold mb-4">Automation & Control</h3>
+                    <ul class="space-y-3">
+                        <li><a href="/technology/automation/engine-control" class="hover:text-blue-600">Engine Control Systems</a></li>
+                        <li><a href="/technology/automation/vessel-management" class="hover:text-blue-600">Vessel Management Systems</a></li>
+                        <li><a href="/technology/automation/dynamic-positioning" class="hover:text-blue-600">Dynamic Positioning</a></li>
+                        <li><a href="/technology/automation/autonomous-systems" class="hover:text-blue-600">Autonomous Systems</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Professional Development -->
+    <section id="professional" class="py-20">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16">Professional Development</h2>
+            <div class="grid md:grid-cols-4 gap-8">
+                <!-- Career Paths -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-xl font-bold mb-4">Career Paths</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/professional/careers/deck-officer" class="text-blue-600 hover:text-blue-800">Deck Officer</a></li>
+                        <li><a href="/professional/careers/engineering-officer" class="text-blue-600 hover:text-blue-800">Engineering Officer</a></li>
+                        <li><a href="/professional/careers/maritime-pilot" class="text-blue-600 hover:text-blue-800">Maritime Pilot</a></li>
+                    </ul>
+                </div>
+
+                <!-- Certifications -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-xl font-bold mb-4">Certifications</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/professional/certifications/stcw" class="text-blue-600 hover:text-blue-800">STCW Certifications</a></li>
+                        <li><a href="/professional/certifications/specialized" class="text-blue-600 hover:text-blue-800">Specialized Training</a></li>
+                        <li><a href="/professional/certifications/management" class="text-blue-600 hover:text-blue-800">Management Level</a></li>
+                    </ul>
+                </div>
+
+                <!-- Skill Development -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-xl font-bold mb-4">Skill Development</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/professional/skills/leadership" class="text-blue-600 hover:text-blue-800">Maritime Leadership</a></li>
+                        <li><a href="/professional/skills/crisis-management" class="text-blue-600 hover:text-blue-800">Crisis Management</a></li>
+                        <li><a href="/professional/skills/resource-management" class="text-blue-600 hover:text-blue-800">Resource Management</a></li>
+                    </ul>
+                </div>
+
+                <!-- Industry Standards -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-xl font-bold mb-4">Industry Standards</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/professional/standards/ism-code" class="text-blue-600 hover:text-blue-800">ISM Code</a></li>
+                        <li><a href="/professional/standards/quality-standards" class="text-blue-600 hover:text-blue-800">Quality Standards</a></li>
+                        <li><a href="/professional/standards/best-practices" class="text-blue-600 hover:text-blue-800">Best Practices</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Global Maritime Network -->
+    <section id="network" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-16">Global Maritime Network</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- International Organizations -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-2xl font-bold mb-4">International Organizations</h3>
+                    <ul class="space-y-3">
+                        <li><a href="/network/organizations/imo" class="hover:text-blue-600">International Maritime Organization</a></li>
+                        <li><a href="/network/organizations/classification" class="hover:text-blue-600">Classification Societies</a></li>
+                        <li><a href="/network/organizations/industry-bodies" class="hover:text-blue-600">Industry Bodies</a></li>
+                    </ul>
+                </div>
+
+                <!-- Maritime Institutes -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-2xl font-bold mb-4">Maritime Institutes</h3>
+                    <ul class="space-y-3">
+                        <li><a href="/network/institutes/academies" class="hover:text-blue-600">Maritime Academies</a></li>
+                        <li><a href="/network/institutes/research-centers" class="hover:text-blue-600">Research Centers</a></li>
+                        <li><a href="/network/institutes/training-facilities" class="hover:text-blue-600">Training Facilities</a></li>
+                    </ul>
+                </div>
+
+                <!-- Industry Connections -->
+                <div class="content-card p-6 rounded-xl bg-white">
+                    <h3 class="text-2xl font-bold mb-4">Industry Connections</h3>
+                    <ul class="space-y-3">
+                        <li><a href="/network/connections/shipping-companies" class="hover:text-blue-600">Shipping Companies</a></li>
+                        <li><a href="/network/connections/port-authorities" class="hover:text-blue-600">Port Authorities</a></li>
+                        <li><a href="/network/connections/maritime-services" class="hover:text-blue-600">Maritime Services</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+<!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8">
+                <!-- Company Info -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">SeaBooks</h4>
+                    <p class="text-gray-400">Your comprehensive source for maritime knowledge, research, and history.</p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/about" class="text-gray-400 hover:text-white">About Us</a></li>
+                        <li><a href="/contact" class="text-gray-400 hover:text-white">Contact</a></li>
+                        <li><a href="/support" class="text-gray-400 hover:text-white">Support</a></li>
+                        <li><a href="/terms" class="text-gray-400 hover:text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+
+                <!-- Resources -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/collections" class="text-gray-400 hover:text-white">Collections</a></li>
+                        <li><a href="/research" class="text-gray-400 hover:text-white">Research</a></li>
+                        <li><a href="/education" class="text-gray-400 hover:text-white">Education</a></li>
+                        <li><a href="/network" class="text-gray-400 hover:text-white">Network</a></li>
+                    </ul>
+                </div>
+
+                <!-- Legal -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2">
+                        <li><a href="/privacy" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
+                        <li><a href="/cookies" class="text-gray-400 hover:text-white">Cookie Policy</a></li>
+                        <li><a href="/licensing" class="text-gray-400 hover:text-white">Licensing</a></li>
+                        <li><a href="/sitemap" class="text-gray-400 hover:text-white">Sitemap</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 SeaBooks. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
