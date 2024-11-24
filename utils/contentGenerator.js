@@ -106,7 +106,7 @@ export const generatePageContent = async (path) => {
   }
   
   const completion = await openai.chat.completions.create({
-    model: "gpt-4-mini",
+    model: "GPT-4o mini",
     messages: [
       {
         role: "system",
