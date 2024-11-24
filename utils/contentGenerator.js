@@ -7,18 +7,92 @@ const openai = new OpenAI({
 });
 
 const enforceRootedLinks = (content) => {
-  // Replace relative links that don't start with / or http
   return content.replace(/\[([^\]]+)\]\((?!\/|http)([^)]+)\)/g, (match, text, url) => {
     return `[${text}](/${url.trim()})`;
   });
 };
 
 const processMarkdownLinks = (content) => {
-  // Ensure all internal links have proper text
   return content.replace(/\[\/([^\]]+)\]\(\/([^)]+)\)/g, (match, text, url) => {
     const title = url.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     return `[${title}](/${url})`;
   });
+};
+
+const processCustomBlocks = (content) => {
+  const patterns = {
+    timeline: /:::timeline:::([\s\S]*?):::/g,
+    stats: /:::stats:::([\s\S]*?):::/g,
+    quiz: /:::quiz:::([\s\S]*?):::/g,
+    chart: /:::chart:::([\s\S]*?):::/g,
+    features: /:::features:::([\s\S]*?):::/g
+  };
+
+  let processedContent = content;
+
+  // Process timeline blocks differently to avoid pre/code wrapping
+  processedContent = processedContent.replace(patterns.timeline, (match, timelineContent) => {
+    const events = timelineContent.trim().split('\n').map(line => {
+      const [year, ...description] = line.split(' - ');
+      return {
+        year: year.trim(),
+        description: description.join(' - ').trim()
+      };
+    });
+    
+    const timelineItems = events.map(event => `
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="font-bold text-xl text-blue-600">${event.year}</div>
+          <div class="mt-2 text-gray-700">${event.description}</div>
+        </div>
+      </div>
+    `).join('');
+
+    return `<div class="timeline-container">${timelineItems}</div>`;
+  });
+
+  // Process other custom blocks
+  Object.entries(patterns).forEach(([type, pattern]) => {
+    if (type !== 'timeline') {
+      processedContent = processedContent.replace(pattern, (match, content) => {
+        const cleanContent = content.trim();
+        switch (type) {
+          case 'stats':
+            const stats = cleanContent.split('\n').map(line => {
+              const [label, value] = line.split(':').map(s => s.trim());
+              return { label, value };
+            });
+            return createStats(stats);
+          case 'quiz':
+            const lines = cleanContent.split('\n');
+            const question = lines[0];
+            const options = lines.slice(1).map(line => {
+              const isCorrect = line.startsWith('*- ');
+              const text = line.replace(/^\*?- /, '').trim();
+              return { text, isCorrect };
+            });
+            return createQuiz(question, options);
+          case 'chart':
+            const chartLines = cleanContent.split('\n');
+            const title = chartLines[0];
+            const data = chartLines.slice(1).map(line => {
+              const [label, value] = line.split('|').map(s => s.trim());
+              return { label, value: parseFloat(value) };
+            });
+            return createChart(title, data);
+          case 'features':
+            const features = cleanContent.split('\n').map(f => f.trim());
+            return createFeatures(features);
+          default:
+            return match;
+        }
+      });
+    }
+  });
+
+  return processedContent;
 };
 
 export const generatePageContent = async (path) => {
@@ -32,7 +106,7 @@ export const generatePageContent = async (path) => {
   }
   
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+    model: "gpt-4-mini",
     messages: [
       {
         role: "system",
@@ -82,6 +156,7 @@ export const generatePageContent = async (path) => {
   let content = completion.choices[0].message.content;
   content = enforceRootedLinks(content);
   content = processMarkdownLinks(content);
+  content = processCustomBlocks(content);
   
   return content;
 };
