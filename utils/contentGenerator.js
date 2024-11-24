@@ -25,30 +25,32 @@ const processMarkdownLinks = (content) => {
 };
 
 const processCustomBlocks = (content) => {
+  let processedContent = content;
+
+  // Process timeline blocks first
+  processedContent = processedContent.replace(/:::timeline:::([\s\S]*?):::/g, (match, content) => {
+    const events = content.trim().split('\n').map(line => {
+      const [year, ...description] = line.split(' - ');
+      return {
+        year: year.trim(),
+        description: description.join(' - ').trim()
+      };
+    });
+    return createTimeline(events);
+  });
+
+  // Process other custom blocks
   const patterns = {
-    timeline: /:::timeline:::([\s\S]*?):::/g,
     stats: /:::stats:::([\s\S]*?):::/g,
     quiz: /:::quiz:::([\s\S]*?):::/g,
     chart: /:::chart:::([\s\S]*?):::/g,
     features: /:::features:::([\s\S]*?):::/g
   };
 
-  let processedContent = content;
-
-  // Process each custom block
   Object.entries(patterns).forEach(([type, pattern]) => {
     processedContent = processedContent.replace(pattern, (match, content) => {
       const cleanContent = content.trim();
       switch (type) {
-        case 'timeline':
-          const events = cleanContent.split('\n').map(line => {
-            const [year, ...description] = line.split(' - ');
-            return {
-              year: year.trim(),
-              description: description.join(' - ').trim()
-            };
-          });
-          return createTimeline(events);
         case 'stats':
           const stats = cleanContent.split('\n').map(line => {
             const [label, value] = line.split(':').map(s => s.trim());
@@ -91,10 +93,14 @@ const processCustomBlocks = (content) => {
     return `<a href="${path}" class="internal-link">${text}</a>`;
   });
 
-  // Remove any pre/code wrapping from timeline components
+  // Clean up any remaining pre/code tags around components
   processedContent = processedContent.replace(/<pre><code[^>]*>([\s\S]*?)<\/code><\/pre>/g, (match, content) => {
-    if (content.includes('timeline-container') || content.includes('timeline-item')) {
-      return content;
+    if (content.includes('timeline-container') || 
+        content.includes('stats-grid') || 
+        content.includes('features-grid') || 
+        content.includes('quiz-container') || 
+        content.includes('chart-container')) {
+      return content.trim();
     }
     return match;
   });
@@ -154,7 +160,7 @@ export const generatePageContent = async (path) => {
         ${wikiData.extract ? `Include these verified facts: ${wikiData.extract}` : ''}`
       }
     ],
-    max_tokens: 12000, // Increased but still within 16,384 limit
+    max_tokens: 12000,
     temperature: 0.7 + (Math.random() * 0.3),
     presence_penalty: 0.3,
     frequency_penalty: 0.5
