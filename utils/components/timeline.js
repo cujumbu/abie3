@@ -1,15 +1,13 @@
 export const createTimeline = (events) => {
-  return `
-    <div class="timeline-container my-8">
-      ${events.map((event, index) => `
-        <div class="timeline-item mb-4 pl-6 border-l-2 border-blue-500">
-          <div class="timeline-dot"></div>
-          <div class="mb-1">
-            <span class="font-bold text-blue-600">${event.year}</span>
-          </div>
-          <div class="text-gray-700">${event.description}</div>
-        </div>
-      `).join('')}
+  const timelineItems = events.map(event => `
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-content">
+        <div class="font-bold text-xl text-blue-600">${event.year}</div>
+        <div class="mt-2 text-gray-700">${event.description}</div>
+      </div>
     </div>
-  `;
+  `).join('');
+
+  return `<div class="timeline-container">${timelineItems}</div>`;
 };
