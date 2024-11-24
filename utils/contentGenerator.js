@@ -91,6 +91,14 @@ const processCustomBlocks = (content) => {
     return `<a href="${path}" class="internal-link">${text}</a>`;
   });
 
+  // Remove any pre/code wrapping from timeline components
+  processedContent = processedContent.replace(/<pre><code[^>]*>([\s\S]*?)<\/code><\/pre>/g, (match, content) => {
+    if (content.includes('timeline-container') || content.includes('timeline-item')) {
+      return content;
+    }
+    return match;
+  });
+
   return processedContent;
 };
 
@@ -146,7 +154,7 @@ export const generatePageContent = async (path) => {
         ${wikiData.extract ? `Include these verified facts: ${wikiData.extract}` : ''}`
       }
     ],
-    max_tokens: Math.floor(Math.random() * (2000 - 1000) + 1000),
+    max_tokens: 12000, // Increased but still within 16,384 limit
     temperature: 0.7 + (Math.random() * 0.3),
     presence_penalty: 0.3,
     frequency_penalty: 0.5
