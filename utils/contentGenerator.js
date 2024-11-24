@@ -25,12 +25,33 @@ const processMarkdownLinks = (content) => {
 };
 
 const processRelatedTopics = (content) => {
-  return content.replace(
-    /(### Related Topics|## Related Topics)\s*\n((?:\/[a-z0-9-]+(?:\s*\n|$))+)/gm,
-    (match, heading, topics) => {
+  // First pattern: Markdown list of paths
+  content = content.replace(
+    /(?:### Related Topics|## Related Topics|#+ Related Topics)\s*(?:\n|$)((?:[-*]?\s*\/[a-z0-9-]+(?:\s*\n|$))+)/gm,
+    (match, topics) => {
       const topicLinks = topics
         .trim()
         .split('\n')
+        .map(topic => {
+          const path = topic.replace(/^[-*]\s*/, '').trim();
+          const title = path.substring(1).replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          return `<li><a href="${path}" class="internal-link">${title}</a></li>`;
+        })
+        .join('\n');
+
+      return `## Related Topics\n<ul>\n${topicLinks}\n</ul>`;
+    }
+  );
+
+  // Second pattern: Line-separated paths with <br> or newlines
+  content = content.replace(
+    /(?:### Related Topics|## Related Topics|#+ Related Topics)\s*(?:\n|$)((?:\/[a-z0-9-]+(?:\s*(?:<br>|\n|$))+))/gm,
+    (match, topics) => {
+      const topicLinks = topics
+        .replace(/<br>/g, '\n')
+        .trim()
+        .split('\n')
+        .filter(topic => topic.trim())
         .map(topic => {
           const path = topic.trim();
           const title = path.substring(1).replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -38,9 +59,11 @@ const processRelatedTopics = (content) => {
         })
         .join('\n');
 
-      return `${heading}\n<ul>\n${topicLinks}\n</ul>`;
+      return `## Related Topics\n<ul>\n${topicLinks}\n</ul>`;
     }
   );
+
+  return content;
 };
 
 const processCustomBlocks = (content) => {
@@ -174,10 +197,11 @@ export const generatePageContent = async (path) => {
            Feature 2: Description
            Feature 3: Description
            :::
-        7. For related topics, list each topic on a new line with a leading slash:
-           /topic-one
-           /topic-two
-           /topic-three`
+        7. For related topics, use this format:
+           ## Related Topics
+           - /topic-one
+           - /topic-two
+           - /topic-three`
       },
       {
         role: "user",
