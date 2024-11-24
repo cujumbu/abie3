@@ -1,6 +1,10 @@
 import OpenAI from 'openai';
 import { getRandomPrompt } from '../templates/systemPrompts.js';
 import { fetchWikipediaData } from './wikipediaEnhancer.js';
+import { createStats } from './components/stats.js';
+import { createQuiz } from './components/quiz.js';
+import { createChart } from './components/chart.js';
+import { createFeatures } from './components/features.js';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
