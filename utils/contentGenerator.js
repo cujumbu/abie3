@@ -25,13 +25,16 @@ const processMarkdownLinks = (content) => {
   });
 };
 
-const isTopicInScope = (topic) => {
-  if (!siteContext.relatedTopicsScope.length) return true;
-  
+const isTopicRelevant = (topic) => {
   const normalizedTopic = topic.toLowerCase();
-  return siteContext.relatedTopicsScope.some(scopeTopic => 
-    normalizedTopic.includes(scopeTopic) || 
-    scopeTopic.includes(normalizedTopic)
+  const allRelevantKeywords = [
+    ...siteContext.relatedTopicsScope,
+    ...(siteContext.relevanceKeywords || [])
+  ];
+  
+  return allRelevantKeywords.some(keyword => 
+    normalizedTopic.includes(keyword.toLowerCase()) ||
+    keyword.toLowerCase().includes(normalizedTopic)
   );
 };
 
@@ -46,7 +49,7 @@ const processRelatedTopics = (content) => {
         .map(topic => {
           const path = topic.replace(/^[-*]\s*/, '').trim();
           const title = path.substring(1).replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-          if (!isTopicInScope(title)) return null;
+          if (!isTopicRelevant(title)) return null;
           return `<li><a href="${path}" class="internal-link">${title}</a></li>`;
         })
         .filter(Boolean)
@@ -68,7 +71,7 @@ const processRelatedTopics = (content) => {
         .map(topic => {
           const path = topic.trim();
           const title = path.substring(1).replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-          if (!isTopicInScope(title)) return null;
+          if (!isTopicRelevant(title)) return null;
           return `<li><a href="${path}" class="internal-link">${title}</a></li>`;
         })
         .filter(Boolean)
@@ -212,13 +215,13 @@ export const generatePageContent = async (path) => {
            Feature 2: Description
            Feature 3: Description
            :::
-        7. For related topics, use this format:
+        7. For related topics, suggest topics that are relevant to the current content while maintaining connection to the main topic.
            ## Related Topics
            - /topic-one
            - /topic-two
            - /topic-three
            
-        Important: Keep all content and related topics within the context of ${siteContext.mainTopic}.`
+        Important: While focusing on ${siteContext.mainTopic}, include related topics that are relevant to the current content, maintaining topical relevance.`
       },
       {
         role: "user",
