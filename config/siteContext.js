@@ -1,5 +1,11 @@
 export const siteContext = {
   mainTopic: 'Maritime',
+  // Cache configuration (in seconds)
+  cache: {
+    ttl: 5184000,  // 60 days (2 months)
+    checkperiod: 600,  // Check for expired keys every 10 minutes
+    maxKeys: 1000  // Maximum number of pages to cache
+  },
   context: `Focus on maritime-related content including:
     - Naval History and Heritage
     - Navigation and Maritime Technology
