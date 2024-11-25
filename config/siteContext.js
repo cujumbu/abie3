@@ -1,13 +1,17 @@
 export const siteContext = {
   mainTopic: 'Maritime',
-  // Site branding and layout
+  index: {
+    enabled: true,
+    path: '/custom/index.html',
+    fallback: true
+  },
   site: {
     name: 'SeaBooks',
     tagline: 'Your Complete Maritime Knowledge Hub',
     description: "Explore the world's most comprehensive collection of maritime literature, research, and historical documents",
     logo: {
-      type: 'text', // or 'image'
-      content: '⚓', // emoji for text type, or URL for image type
+      type: 'text',
+      content: '⚓',
       text: 'SeaBooks'
     },
     theme: {
@@ -57,11 +61,10 @@ export const siteContext = {
       bottomText: '© 2024 SeaBooks. All rights reserved.'
     }
   },
-  // Cache configuration (in seconds)
   cache: {
-    ttl: 5184000,  // 60 days (2 months)
-    checkperiod: 600,  // Check for expired keys every 10 minutes
-    maxKeys: 1000  // Maximum number of pages to cache
+    ttl: 5184000, // 60 days in seconds
+    checkperiod: 600, // Check every 10 minutes
+    maxKeys: 1000 // Maximum number of cached pages
   },
   context: `Focus on maritime-related content including:
     - Naval History and Heritage
