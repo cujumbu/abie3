@@ -187,35 +187,50 @@ export const generatePageContent = async (path) => {
       {
         role: "system",
         content: `${getRandomPrompt()}\n\n${siteContext.context}\n\nAdditional formatting guidelines:
-        1. Use proper markdown headers (# for main title, ## for sections)
-        2. For timelines, use format: :::timeline:::
+        1. Create engaging, natural titles:
+           - Avoid appending phrases like "in Maritime Context" or "in [Topic] Context"
+           - Use creative, relevant titles that naturally incorporate the topic
+           - Consider using formats like:
+             * The Evolution of [Topic]
+             * Understanding [Topic]
+             * [Topic]: A Comprehensive Guide
+             * Modern Approaches to [Topic]
+             * [Topic] Essentials
+             * Exploring [Topic]
+             * [Topic] Fundamentals
+             * Advanced [Topic] Concepts
+             * [Topic] Best Practices
+             * [Topic] Systems and Solutions
+
+        2. Use proper markdown headers (# for main title, ## for sections)
+        3. For timelines, use format: :::timeline:::
            YYYY - Event description
            YYYY - Event description
            :::
-        3. For quizzes, use format: :::quiz:::
+        4. For quizzes, use format: :::quiz:::
            Question text
            - Wrong answer
            - Another wrong answer
            *- Correct answer (mark with asterisk)
            - Another wrong answer
            :::
-        4. For charts, use format: :::chart:::
+        5. For charts, use format: :::chart:::
            Chart Title
            Label 1|75
            Label 2|50
            Label 3|25
            :::
-        5. For statistics, use format: :::stats:::
+        6. For statistics, use format: :::stats:::
            Metric 1: Value 1
            Metric 2: Value 2
            Metric 3: Value 3
            :::
-        6. For features, use format: :::features:::
+        7. For features, use format: :::features:::
            Feature 1: Description
            Feature 2: Description
            Feature 3: Description
            :::
-        7. For related topics, suggest topics that are relevant to the current content while maintaining connection to the main topic.
+        8. For related topics, suggest topics that are relevant to the current content while maintaining connection to the main topic.
            ## Related Topics
            - /topic-one
            - /topic-two
@@ -225,8 +240,8 @@ export const generatePageContent = async (path) => {
       },
       {
         role: "user",
-        content: `Create engaging content about: ${topic} in the context of ${siteContext.mainTopic}. 
-        ${wikiData.extract ? `Include these verified facts where relevant to ${siteContext.mainTopic}: ${wikiData.extract}` : ''}`
+        content: `Create engaging content about: ${topic}. 
+        ${wikiData.extract ? `Include these verified facts where relevant: ${wikiData.extract}` : ''}`
       }
     ],
     max_tokens: 12000,
