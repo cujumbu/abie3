@@ -4,6 +4,8 @@ import NodeCache from 'node-cache';
 import { generatePageContent } from './utils/contentGenerator.js';
 import { createHtmlPage } from './utils/templateEngine.js';
 import { siteContext } from './config/siteContext.js';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 // Initialize environment variables
 dotenv.config();
@@ -16,8 +18,8 @@ const port = process.env.PORT || 3000;
 const pageCache = new NodeCache({ 
   stdTTL: siteContext.cache?.ttl || 86400,
   checkperiod: siteContext.cache?.checkperiod || 600,
-  maxKeys: siteContext.cache?.maxKeys || 1000, // Limit total cached items
-  useClones: false // Reduce memory usage
+  maxKeys: siteContext.cache?.maxKeys || 1000,
+  useClones: false
 });
 
 // Rate limiting for crawlers
@@ -60,6 +62,20 @@ setInterval(() => {
   });
 }, 3600000);
 
+// Try to load custom index file
+const loadCustomIndex = async () => {
+  if (!siteContext.index?.enabled) return null;
+  
+  try {
+    const indexPath = path.join(process.cwd(), siteContext.index.path);
+    const content = await fs.readFile(indexPath, 'utf8');
+    return content;
+  } catch (error) {
+    console.log('Custom index not found:', error.message);
+    return null;
+  }
+};
+
 // Main route handler
 app.get('*', async (req, res) => {
   try {
@@ -70,8 +86,18 @@ app.get('*', async (req, res) => {
       return res.status(429).send('Too Many Requests');
     }
 
+    // Handle root path
     if (req.path === '/') {
-      return res.send('Welcome to the AI Content Generator. Enter any path to generate content!');
+      // Try to load custom index
+      const customIndex = await loadCustomIndex();
+      if (customIndex) {
+        return res.send(customIndex);
+      }
+      
+      // Use default welcome message if no custom index or fallback disabled
+      if (!siteContext.index?.fallback) {
+        return res.send('Welcome to the AI Content Generator. Enter any path to generate content!');
+      }
     }
 
     // Check cache first
