@@ -56,6 +56,79 @@ renderer.code = (code, language) => {
 
 marked.use({ renderer });
 
+// Process custom blocks
+const processCustomBlocks = (content) => {
+  let processedContent = content;
+
+  // Process timeline blocks first
+  processedContent = processedContent.replace(/:::timeline:::([\s\S]*?):::/g, (match, content) => {
+    const events = content.trim().split('\n').map(line => {
+      const [year, ...description] = line.split(' - ');
+      return {
+        year: year.trim(),
+        description: description.join(' - ').trim()
+      };
+    });
+    return createTimeline(events);
+  });
+
+  // Process other custom blocks
+  const patterns = {
+    stats: /:::stats:::([\s\S]*?):::/g,
+    quiz: /:::quiz:::([\s\S]*?):::/g,
+    chart: /:::chart:::([\s\S]*?):::/g,
+    features: /:::features:::([\s\S]*?):::/g
+  };
+
+  Object.entries(patterns).forEach(([type, pattern]) => {
+    processedContent = processedContent.replace(pattern, (match, content) => {
+      const cleanContent = content.trim();
+      switch (type) {
+        case 'stats':
+          const stats = cleanContent.split('\n').map(line => {
+            const [label, value] = line.split(':').map(s => s.trim());
+            return { label, value };
+          });
+          return createStats(stats);
+        case 'quiz':
+          const lines = cleanContent.split('\n');
+          const question = lines[0];
+          const options = lines.slice(1).map(line => {
+            const isCorrect = line.startsWith('*- ');
+            const text = line.replace(/^\*?- /, '').trim();
+            return { text, isCorrect };
+          });
+          return createQuiz(question, options);
+        case 'chart':
+          const chartLines = cleanContent.split('\n');
+          const title = chartLines[0];
+          const data = chartLines.slice(1).map(line => {
+            const [label, value] = line.split('|').map(s => s.trim());
+            return { label, value: parseFloat(value) };
+          });
+          return createChart(title, data);
+        case 'features':
+          const features = cleanContent.split('\n').map(f => f.trim());
+          return createFeatures(features);
+        default:
+          return match;
+      }
+    });
+  });
+
+  // Process external links
+  processedContent = processedContent.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, (match, text, url) => {
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="external-link">${text}</a>`;
+  });
+
+  // Process internal links (must come after external links)
+  processedContent = processedContent.replace(/\[([^\]]+)\]\(\/([^)]+)\)/g, (match, text, path) => {
+    return `<a href="/${path}" class="internal-link">${text}</a>`;
+  });
+
+  return processedContent;
+};
+
 const createHeader = () => {
   const { site } = siteContext;
   const logo = site.logo.type === 'image' 
