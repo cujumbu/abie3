@@ -1,5 +1,62 @@
 export const siteContext = {
   mainTopic: 'Maritime',
+  // Site branding and layout
+  site: {
+    name: 'SeaBooks',
+    tagline: 'Your Complete Maritime Knowledge Hub',
+    description: "Explore the world's most comprehensive collection of maritime literature, research, and historical documents",
+    logo: {
+      type: 'text', // or 'image'
+      content: '⚓', // emoji for text type, or URL for image type
+      text: 'SeaBooks'
+    },
+    theme: {
+      primary: '#3b82f6',
+      secondary: '#1a365d',
+      accent: '#10B981',
+      headerGradient: 'linear-gradient(135deg, #1a365d 0%, #3b82f6 100%)',
+      headerTextColor: '#ffffff'
+    },
+    navigation: {
+      primary: [
+        { text: 'Historical', href: '/topics/historical-maritime' },
+        { text: 'Navigation', href: '/topics/modern-navigation' },
+        { text: 'Research', href: '/topics/marine-research' },
+        { text: 'Technology', href: '/topics/maritime-technology' },
+        { text: 'Engineering', href: '/topics/naval-engineering' }
+      ],
+      cta: { text: 'Featured Collections', href: '/collections/featured' }
+    },
+    footer: {
+      columns: [
+        {
+          title: 'Quick Links',
+          links: [
+            { text: 'About Us', href: '/about' },
+            { text: 'Contact', href: '/contact' },
+            { text: 'Support', href: '/support' }
+          ]
+        },
+        {
+          title: 'Resources',
+          links: [
+            { text: 'Collections', href: '/collections' },
+            { text: 'Research', href: '/research' },
+            { text: 'Education', href: '/education' }
+          ]
+        },
+        {
+          title: 'Legal',
+          links: [
+            { text: 'Privacy Policy', href: '/privacy' },
+            { text: 'Terms of Service', href: '/terms' },
+            { text: 'Licensing', href: '/licensing' }
+          ]
+        }
+      ],
+      bottomText: '© 2024 SeaBooks. All rights reserved.'
+    }
+  },
   // Cache configuration (in seconds)
   cache: {
     ttl: 5184000,  // 60 days (2 months)
@@ -44,7 +101,6 @@ export const siteContext = {
     'maritime-industry',
     'maritime-trade'
   ],
-  // Additional keywords that indicate topic relevance
   relevanceKeywords: [
     'ship', 'boat', 'vessel', 'sea', 'ocean', 'marine', 'maritime', 'naval',
     'port', 'harbor', 'coast', 'nautical', 'sailing', 'navigation'
