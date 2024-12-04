@@ -7,7 +7,6 @@ import { createChart } from './components/chart.js';
 import { createFeatures } from './components/features.js';
 import { createTimeline } from './components/timeline.js';
 import { createFlashcards } from './components/flashcards.js';
-import { createFlashcards } from './components/flashcards.js';
 import { createSpeedCalculator, createUnitConverter, createFuelCalculator, createDraftCalculator } from './components/maritimeCalculators.js';
 import { createVesselDiagram, createPortLayout, createEquipmentSchematic } from './components/maritimeVisuals.js';
 import { siteContext } from '../config/siteContext.js';
