@@ -24,6 +24,7 @@ export const siteContext = {
     navigation: {
       primary: [
         { text: 'Historical', href: '/topics/historical-maritime' },
+        { text: 'Tools', href: '/tools' },
         { text: 'Navigation', href: '/topics/modern-navigation' },
         { text: 'Research', href: '/topics/marine-research' },
         { text: 'Technology', href: '/topics/maritime-technology' },
