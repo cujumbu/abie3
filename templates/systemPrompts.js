@@ -53,6 +53,11 @@ Key requirements:
      Feature 3 with benefits
      :::
    - Flashcard review with format:
+    :::flashcards:::
+    What is a nautical mile?|A unit of measurement equal to 1.852 kilometers
+    What is a knot?|One nautical mile per hour
+    What is draft?|The vertical distance between the waterline and the bottom of the hull
+    :::
      :::flashcards:::
      What is a nautical mile?|A unit of measurement equal to 1.852 kilometers
      What is a knot?|One nautical mile per hour
