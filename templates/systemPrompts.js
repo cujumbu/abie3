@@ -35,13 +35,17 @@ Key requirements:
      :::
    - Vessel diagrams with format:
      :::vessel-diagram:::
-     container|tanker|bulker
+    type: container    # For container vessels
+    type: tanker      # For tanker vessels
+    type: bulker      # For bulk carriers
      :::
    - Port layouts with format:
      :::port-layout:::
    - Equipment schematics with format:
      :::equipment-schematic:::
-     radar|engine|propulsion
+    type: radar       # For radar systems
+    type: engine      # For engine systems
+    type: propulsion  # For propulsion systems
      :::
    - Feature highlights with :::features:::
      Feature 1 with details
