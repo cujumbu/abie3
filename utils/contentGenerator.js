@@ -6,8 +6,8 @@ import { createQuiz } from './components/quiz.js';
 import { createChart } from './components/chart.js';
 import { createFeatures } from './components/features.js';
 import { createTimeline } from './components/timeline.js';
-import { createSpeedCalculator, createUnitConverter } from './components/maritimeCalculators.js';
-import { createSpeedCalculator, createUnitConverter } from './components/maritimeCalculators.js';
+import { createSpeedCalculator, createUnitConverter, createFuelCalculator, createDraftCalculator } from './components/maritimeCalculators.js';
+import { createVesselDiagram, createPortLayout, createEquipmentSchematic } from './components/maritimeVisuals.js';
 import { siteContext } from '../config/siteContext.js';
 
 const openai = new OpenAI({
@@ -92,10 +92,15 @@ const processCustomBlocks = (content) => {
   // Process calculator blocks
   processedContent = processedContent.replace(/:::speed-calculator:::/g, () => createSpeedCalculator());
   processedContent = processedContent.replace(/:::unit-converter:::/g, () => createUnitConverter());
+  processedContent = processedContent.replace(/:::fuel-calculator:::/g, () => createFuelCalculator());
+  processedContent = processedContent.replace(/:::draft-calculator:::/g, () => createDraftCalculator());
 
-  // Process calculator blocks
-  processedContent = processedContent.replace(/:::speed-calculator:::/g, () => createSpeedCalculator());
-  processedContent = processedContent.replace(/:::unit-converter:::/g, () => createUnitConverter());
+  // Process visual blocks
+  processedContent = processedContent.replace(/:::vessel-diagram:::([\s\S]*?):::/g, (match, type) => 
+    createVesselDiagram(type.trim()));
+  processedContent = processedContent.replace(/:::port-layout:::/g, () => createPortLayout());
+  processedContent = processedContent.replace(/:::equipment-schematic:::([\s\S]*?):::/g, (match, equipment) => 
+    createEquipmentSchematic(equipment.trim()));
 
   // Process timeline blocks first
   processedContent = processedContent.replace(/:::timeline:::([\s\S]*?):::/g, (match, content) => {
@@ -190,10 +195,11 @@ export const generatePageContent = async (path) => {
       return `# Maritime Tools
 
 ## Navigation & Calculation Tools
-
 :::features:::
 [Speed Calculator](/tools/speed-calculator): Calculate speed, time, and distance for maritime navigation
 [Unit Converter](/tools/unit-converter): Convert between maritime units like nautical miles, kilometers, and knots
+[Fuel Calculator](/tools/fuel-calculator): Calculate fuel consumption for voyages
+[Draft Calculator](/tools/draft-calculator): Calculate mean draft and trim
 :::
 
 ## Related Topics
@@ -242,6 +248,65 @@ Convert between different maritime units of measurement.
 /navigation-systems
 /maritime-calculations`;
     }
+    
+    if (path === '/tools/fuel-calculator') {
+      return `# Maritime Fuel Calculator
+
+Calculate estimated fuel consumption for your voyage based on distance, speed, and consumption rate.
+
+:::fuel-calculator:::
+
+## Understanding Fuel Calculations
+
+The fuel consumption calculation takes into account:
+- Distance in nautical miles
+- Vessel speed in knots
+- Daily fuel consumption rate
+
+## Related Topics
+/maritime-efficiency
+/fuel-management
+/vessel-operations`;
+    }
+    
+    if (path === '/tools/draft-calculator') {
+      return `# Draft Survey Calculator
+
+Calculate mean draft and trim based on forward and aft draft measurements.
+
+:::draft-calculator:::
+
+## Understanding Draft Measurements
+
+- Mean Draft: Average of forward and aft draft readings
+- Trim: Difference between aft and forward drafts
+- Positive trim indicates vessel is down by stern
+- Negative trim indicates vessel is down by bow
+
+## Related Topics
+/vessel-stability
+/draft-surveys
+/maritime-safety`;
+    }
+    
+    if (path === '/tools/unit-converter') {
+      return `# Maritime Unit Converter
+
+Convert between different maritime units of measurement.
+
+:::unit-converter:::
+
+## Common Maritime Conversions
+
+- 1 Nautical Mile = 1.852 Kilometers
+- 1 Knot = 1.852 Kilometers per Hour
+- 1 Nautical Mile = 1.15078 Statute Miles
+
+## Related Topics
+/maritime-units
+/navigation-systems
+/maritime-calculations`;
+    }
   }
   
   let wikiData = { extract: '' };
@@ -261,6 +326,26 @@ Convert between different maritime units of measurement.
       {
         role: "system",
         content: `${getRandomPrompt()}\n\n${siteContext.context}\n\nAdditional formatting guidelines:
+        
+        When discussing vessel types, port operations, or maritime equipment, include relevant visual diagrams:
+        
+        1. For vessel discussions:
+           :::vessel-diagram:::
+           container    # For container ship discussions
+           tanker      # For tanker vessel discussions
+           bulker      # For bulk carrier discussions
+           :::
+        
+        2. For port operations:
+           :::port-layout:::
+        
+        3. For equipment discussions:
+           :::equipment-schematic:::
+           radar       # For navigation equipment
+           engine      # For engine discussions
+           propulsion  # For propulsion systems
+           :::
+        
         1. Create engaging, natural titles:
            - Avoid appending phrases like "in Maritime Context" or "in [Topic] Context"
            - Use creative, relevant titles that naturally incorporate the topic
