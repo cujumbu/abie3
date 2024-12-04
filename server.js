@@ -70,30 +70,98 @@ app.get('/api/stats', (req, res) => {
 // Admin analytics endpoint
 app.get('/admin/analytics', async (req, res) => {
   try {
+    // Basic auth check
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Basic ')) {
+      res.setHeader('WWW-Authenticate', 'Basic realm="Admin Access"');
+      return res.status(401).send('Authentication required');
+    }
+
+    const base64Credentials = authHeader.split(' ')[1];
+    const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+    const [username, password] = credentials.split(':');
+
+    if (username !== process.env.ADMIN_USER || password !== process.env.ADMIN_PASSWORD) {
+      return res.status(401).send('Invalid credentials');
+    }
+
     const stats = await Analytics.getStats();
     if (!stats) {
       return res.status(500).send('Error fetching analytics');
     }
     
-    // Render admin dashboard
+    // Enhanced admin dashboard with more detailed stats
     const adminHtml = createHtmlPage(`
-      # Analytics Dashboard
+      <div class="space-y-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-blue-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold text-blue-800">Total Views</h3>
+            <p class="text-3xl font-bold text-blue-600">${stats.totalViews}</p>
+            <p class="text-sm text-blue-600">Last 30 days</p>
+          </div>
+          <div class="bg-green-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold text-green-800">Unique Pages</h3>
+            <p class="text-3xl font-bold text-green-600">${Object.keys(stats.pageViews).length}</p>
+            <p class="text-sm text-green-600">Total unique pages viewed</p>
+          </div>
+          <div class="bg-purple-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold text-purple-800">Top Referrer</h3>
+            <p class="text-3xl font-bold text-purple-600">${
+              Object.entries(stats.topReferrers)[0]?.[0] || 'Direct'
+            }</p>
+            <p class="text-sm text-purple-600">Most common source</p>
+          </div>
+        </div>
 
-      ## Overview
-      Total Views (Last 30 Days): ${stats.totalViews}
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h2 class="text-xl font-bold mb-4">Most Viewed Pages</h2>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead>
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Path</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Views</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                ${Object.entries(stats.pageViews)
+                  .sort(([,a], [,b]) => b - a)
+                  .slice(0, 10)
+                  .map(([path, views]) => `
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${path}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${views}</td>
+                    </tr>
+                  `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-      ## Most Viewed Pages
-      ${Object.entries(stats.pageViews)
-        .sort(([,a], [,b]) => b - a)
-        .slice(0, 10)
-        .map(([path, views]) => `- ${path}: ${views} views`)
-        .join('\n')}
-
-      ## Top Referrers
-      ${Object.entries(stats.topReferrers)
-        .sort(([,a], [,b]) => b - a)
-        .map(([referrer, count]) => `- ${referrer}: ${count} visits`)
-        .join('\n')}
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h2 class="text-xl font-bold mb-4">Top Referrers</h2>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead>
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Visits</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                ${Object.entries(stats.topReferrers)
+                  .sort(([,a], [,b]) => b - a)
+                  .map(([referrer, count]) => `
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${referrer || 'Direct'}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${count}</td>
+                    </tr>
+                  `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     `, { title: 'Analytics Dashboard' });
 
     res.send(adminHtml);
