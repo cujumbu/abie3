@@ -6,6 +6,7 @@ import { createQuiz } from './components/quiz.js';
 import { createChart } from './components/chart.js';
 import { createFeatures } from './components/features.js';
 import { createTimeline } from './components/timeline.js';
+import { createSpeedCalculator, createUnitConverter } from './components/maritimeCalculators.js';
 import { siteContext } from '../config/siteContext.js';
 
 const openai = new OpenAI({
@@ -86,6 +87,10 @@ const processRelatedTopics = (content) => {
 
 const processCustomBlocks = (content) => {
   let processedContent = content;
+
+  // Process calculator blocks
+  processedContent = processedContent.replace(/:::speed-calculator:::/g, () => createSpeedCalculator());
+  processedContent = processedContent.replace(/:::unit-converter:::/g, () => createUnitConverter());
 
   // Process timeline blocks first
   processedContent = processedContent.replace(/:::timeline:::([\s\S]*?):::/g, (match, content) => {
@@ -174,6 +179,66 @@ const processCustomBlocks = (content) => {
 export const generatePageContent = async (path) => {
   const topic = path.replace(/-/g, ' ').substring(1);
   
+  // Handle tools pages
+  if (path.startsWith('/tools')) {
+    if (path === '/tools') {
+      return `# Maritime Tools
+
+## Navigation & Calculation Tools
+
+:::features:::
+[Speed Calculator](/tools/speed-calculator): Calculate speed, time, and distance for maritime navigation
+[Unit Converter](/tools/unit-converter): Convert between maritime units like nautical miles, kilometers, and knots
+:::
+
+## Related Topics
+/maritime-navigation
+/maritime-calculations
+/navigation-systems
+/maritime-technology`;
+    }
+    
+    if (path === '/tools/speed-calculator') {
+      return `# Maritime Speed Calculator
+
+Use this calculator to determine speed, time, or distance for maritime navigation.
+
+:::speed-calculator:::
+
+## Understanding Maritime Speed Calculations
+
+Speed calculations are fundamental to maritime navigation. The relationship between speed, time, and distance follows these principles:
+
+- Speed = Distance ÷ Time
+- Time = Distance ÷ Speed
+- Distance = Speed × Time
+
+## Related Topics
+/maritime-navigation
+/navigation-calculations
+/maritime-technology`;
+    }
+    
+    if (path === '/tools/unit-converter') {
+      return `# Maritime Unit Converter
+
+Convert between different maritime units of measurement.
+
+:::unit-converter:::
+
+## Common Maritime Conversions
+
+- 1 Nautical Mile = 1.852 Kilometers
+- 1 Knot = 1.852 Kilometers per Hour
+- 1 Nautical Mile = 1.15078 Statute Miles
+
+## Related Topics
+/maritime-units
+/navigation-systems
+/maritime-calculations`;
+    }
+  }
+  
   let wikiData = { extract: '' };
   try {
     wikiData = await fetchWikipediaData(topic);
@@ -184,6 +249,10 @@ export const generatePageContent = async (path) => {
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
+      {
+        role: "system",
+        content: "If the path starts with /tools/, skip the OpenAI content generation and return a predefined tools page layout."
+      },
       {
         role: "system",
         content: `${getRandomPrompt()}\n\n${siteContext.context}\n\nAdditional formatting guidelines:
