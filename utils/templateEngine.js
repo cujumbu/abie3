@@ -236,6 +236,7 @@ const template = `<!DOCTYPE html>
     <meta name="description" content="${siteContext.site.description}">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/github-markdown-css/github-markdown.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
       ${styles}
@@ -243,6 +244,14 @@ const template = `<!DOCTYPE html>
         --primary-color: ${siteContext.site.theme.primary};
         --secondary-color: ${siteContext.site.theme.secondary};
         --accent-color: ${siteContext.site.theme.accent};
+      }
+      
+      .diagram-container svg,
+      .schematic-container svg {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
       }
     </style>
 </head>
