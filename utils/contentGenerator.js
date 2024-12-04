@@ -7,6 +7,7 @@ import { createChart } from './components/chart.js';
 import { createFeatures } from './components/features.js';
 import { createTimeline } from './components/timeline.js';
 import { createSpeedCalculator, createUnitConverter } from './components/maritimeCalculators.js';
+import { createSpeedCalculator, createUnitConverter } from './components/maritimeCalculators.js';
 import { siteContext } from '../config/siteContext.js';
 
 const openai = new OpenAI({
@@ -87,6 +88,10 @@ const processRelatedTopics = (content) => {
 
 const processCustomBlocks = (content) => {
   let processedContent = content;
+
+  // Process calculator blocks
+  processedContent = processedContent.replace(/:::speed-calculator:::/g, () => createSpeedCalculator());
+  processedContent = processedContent.replace(/:::unit-converter:::/g, () => createUnitConverter());
 
   // Process calculator blocks
   processedContent = processedContent.replace(/:::speed-calculator:::/g, () => createSpeedCalculator());
