@@ -90,7 +90,7 @@ renderer.code = (code, language) => {
 marked.use({ renderer });
 
 // Process custom blocks
-const processCustomBlocks = (content) => {
+const processCustomBlocks = (content, path) => {
   let processedContent = content;
 
   // Process timeline blocks first
@@ -310,7 +310,7 @@ const template = `<!DOCTYPE html>
 </html>`;
 
 export const createHtmlPage = (content, { title }) => {
-  const processedContent = processCustomBlocks(content);
+  const processedContent = processCustomBlocks(content, title.toLowerCase().replace(/\s+/g, '-'));
   const htmlContent = marked.parse(processedContent);
   
   // Use admin template for admin routes
