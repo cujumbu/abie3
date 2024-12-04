@@ -1,9 +1,9 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import NodeCache from 'node-cache';
 import { generatePageContent } from './utils/contentGenerator.js';
 import { createHtmlPage } from './utils/templateEngine.js';
 import { siteContext } from './config/siteContext.js';
+import { SupabaseCache } from './utils/cache.js';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -14,12 +14,8 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Initialize cache with settings from siteContext
-const pageCache = new NodeCache({
-  stdTTL: siteContext.cache.ttl,
-  checkperiod: siteContext.cache.checkperiod,
-  maxKeys: siteContext.cache.maxKeys
-});
+// Initialize Supabase cache
+const pageCache = new SupabaseCache();
 
 // Visit counter storage
 let visitStats = {
@@ -154,14 +150,15 @@ app.get('*', async (req, res) => {
     }
 
     // Check cache first
-    const cachedContent = pageCache.get(req.path);
+    const cachedContent = await pageCache.get(req.path);
     if (cachedContent) {
       incrementVisits(req.path);
       return res.send(cachedContent);
     }
 
     // Check if we're at cache capacity for crawlers
-    if (isCrawler(userAgent) && pageCache.getStats().keys >= pageCache.options.maxKeys) {
+    const stats = await pageCache.getStats();
+    if (isCrawler(userAgent) && stats.keys >= siteContext.cache.maxKeys) {
       return res.status(429).send('Cache capacity reached');
     }
 
@@ -172,7 +169,7 @@ app.get('*', async (req, res) => {
     const htmlPage = createHtmlPage(content, { title });
     
     // Cache the result
-    pageCache.set(req.path, htmlPage);
+    await pageCache.set(req.path, htmlPage);
     
     // Increment visit counter
     incrementVisits(req.path);
