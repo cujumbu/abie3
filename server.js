@@ -4,6 +4,7 @@ import { generatePageContent } from './utils/contentGenerator.js';
 import { createHtmlPage } from './utils/templateEngine.js';
 import { siteContext } from './config/siteContext.js';
 import { SupabaseCache } from './utils/cache.js';
+import { Analytics } from './utils/analytics.js';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -64,6 +65,42 @@ const incrementVisits = (path) => {
 // API endpoints
 app.get('/api/stats', (req, res) => {
   res.json(visitStats);
+});
+
+// Admin analytics endpoint
+app.get('/admin/analytics', async (req, res) => {
+  try {
+    const stats = await Analytics.getStats();
+    if (!stats) {
+      return res.status(500).send('Error fetching analytics');
+    }
+    
+    // Render admin dashboard
+    const adminHtml = createHtmlPage(`
+      # Analytics Dashboard
+
+      ## Overview
+      Total Views (Last 30 Days): ${stats.totalViews}
+
+      ## Most Viewed Pages
+      ${Object.entries(stats.pageViews)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 10)
+        .map(([path, views]) => `- ${path}: ${views} views`)
+        .join('\n')}
+
+      ## Top Referrers
+      ${Object.entries(stats.topReferrers)
+        .sort(([,a], [,b]) => b - a)
+        .map(([referrer, count]) => `- ${referrer}: ${count} visits`)
+        .join('\n')}
+    `, { title: 'Analytics Dashboard' });
+
+    res.send(adminHtml);
+  } catch (error) {
+    console.error('Admin analytics error:', error);
+    res.status(500).send('Error loading analytics dashboard');
+  }
 });
 
 // Static files middleware
@@ -165,6 +202,17 @@ app.get('*', async (req, res) => {
     // Generate new content
     const content = await generatePageContent(req.path);
     const title = formatTitle(req.path);
+
+    // Track page view
+    if (!isCrawler(userAgent)) {
+      await Analytics.trackPageView({
+        path: req.path,
+        referrer: req.get('referrer'),
+        searchTerm: req.query.q || null,
+        userAgent,
+        ipAddress: clientIP
+      });
+    }
     
     const htmlPage = createHtmlPage(content, { title });
     
