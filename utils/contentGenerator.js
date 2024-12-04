@@ -7,7 +7,6 @@ import { createChart } from './components/chart.js';
 import { createFeatures } from './components/features.js';
 import { createTimeline } from './components/timeline.js';
 import { createFlashcards } from './components/flashcards.js';
-import { createFlashcards } from './components/flashcards.js';
 import { createSpeedCalculator, createUnitConverter, createFuelCalculator, createDraftCalculator } from './components/maritimeCalculators.js';
 import { createVesselDiagram, createPortLayout, createEquipmentSchematic } from './components/maritimeVisuals.js';
 import { siteContext } from '../config/siteContext.js';
@@ -88,7 +87,7 @@ const processRelatedTopics = (content) => {
   return content;
 };
 
-const processCustomBlocks = (content, path) => {
+const processCustomBlocks = (content, currentPath) => {
   let processedContent = content;
 
   // Helper function to determine diagram type based on path and content
@@ -133,14 +132,14 @@ const processCustomBlocks = (content, path) => {
 
   // Process visual blocks
   processedContent = processedContent.replace(/:::vessel-diagram:::([\s\S]*?):::/g, (match, content) => {
-    const type = getDiagramType(path, content);
+    const type = getDiagramType(currentPath, content);
     return createVesselDiagram(type);
   });
 
   processedContent = processedContent.replace(/:::port-layout:::/g, () => createPortLayout());
 
   processedContent = processedContent.replace(/:::equipment-schematic:::([\s\S]*?):::/g, (match, content) => {
-    const equipment = getDiagramType(path, content);
+    const equipment = getDiagramType(currentPath, content);
     return createEquipmentSchematic(equipment);
   });
 
