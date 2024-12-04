@@ -89,6 +89,33 @@ const processRelatedTopics = (content) => {
 const processCustomBlocks = (content) => {
   let processedContent = content;
 
+  // Helper function to determine diagram type based on path and content
+  const getDiagramType = (path, content) => {
+    const pathParts = path.toLowerCase().split('/');
+    
+    // Check for vessel types
+    if (pathParts.includes('tanker') || content.toLowerCase().includes('tanker')) {
+      return 'tanker';
+    }
+    if (pathParts.includes('bulk') || pathParts.includes('bulker') || 
+        content.toLowerCase().includes('bulk carrier')) {
+      return 'bulker';
+    }
+    
+    // Check for equipment types
+    if (pathParts.includes('radar') || content.toLowerCase().includes('radar system')) {
+      return 'radar';
+    }
+    if (pathParts.includes('engine') || content.toLowerCase().includes('marine engine')) {
+      return 'engine';
+    }
+    if (pathParts.includes('propulsion') || content.toLowerCase().includes('propulsion system')) {
+      return 'propulsion';
+    }
+    
+    return 'container'; // Default type
+  };
+
   // Process calculator blocks
   processedContent = processedContent.replace(/:::speed-calculator:::/g, () => createSpeedCalculator());
   processedContent = processedContent.replace(/:::unit-converter:::/g, () => createUnitConverter());
@@ -97,14 +124,14 @@ const processCustomBlocks = (content) => {
 
   // Process visual blocks
   processedContent = processedContent.replace(/:::vessel-diagram:::([\s\S]*?):::/g, (match, content) => {
-    const typeMatch = content.match(/type:\s*(\w+)/);
-    const type = typeMatch ? typeMatch[1] : 'container';
+    const type = getDiagramType(path, content);
     return createVesselDiagram(type);
   });
+
   processedContent = processedContent.replace(/:::port-layout:::/g, () => createPortLayout());
+
   processedContent = processedContent.replace(/:::equipment-schematic:::([\s\S]*?):::/g, (match, content) => {
-    const typeMatch = content.match(/type:\s*(\w+)/);
-    const equipment = typeMatch ? typeMatch[1] : 'radar';
+    const equipment = getDiagramType(path, content);
     return createEquipmentSchematic(equipment);
   });
 
