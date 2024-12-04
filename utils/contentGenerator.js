@@ -445,7 +445,7 @@ Convert between different maritime units of measurement.
   let content = completion.choices[0].message.content;
   content = enforceRootedLinks(content);
   content = processMarkdownLinks(content);
-  content = processCustomBlocks(content);
+  content = processCustomBlocks(content, path);
   
   return content;
 };
