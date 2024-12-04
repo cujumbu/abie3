@@ -86,6 +86,7 @@ app.get('/admin/analytics', async (req, res) => {
     }
 
     const stats = await Analytics.getStats();
+    const cacheStats = await pageCache.getStats();
     if (!stats) {
       return res.status(500).send('Error fetching analytics');
     }
@@ -93,6 +94,28 @@ app.get('/admin/analytics', async (req, res) => {
     // Enhanced admin dashboard with more detailed stats
     const adminHtml = createHtmlPage(`
       <div class="space-y-8">
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h2 class="text-xl font-bold mb-4">Cache Statistics</h2>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="p-4 bg-blue-50 rounded-lg">
+              <h3 class="text-sm font-semibold text-blue-800">Cached Pages</h3>
+              <p class="text-2xl font-bold text-blue-600">${cacheStats.keys}</p>
+            </div>
+            <div class="p-4 bg-green-50 rounded-lg">
+              <h3 class="text-sm font-semibold text-green-800">Cache Size</h3>
+              <p class="text-2xl font-bold text-green-600">${cacheStats.totalSize} MB</p>
+            </div>
+            <div class="p-4 bg-purple-50 rounded-lg">
+              <h3 class="text-sm font-semibold text-purple-800">Oldest Entry</h3>
+              <p class="text-2xl font-bold text-purple-600">${cacheStats.oldestEntry ? cacheStats.oldestEntry.toLocaleDateString() : 'N/A'}</p>
+            </div>
+            <div class="p-4 bg-yellow-50 rounded-lg">
+              <h3 class="text-sm font-semibold text-yellow-800">Newest Entry</h3>
+              <p class="text-2xl font-bold text-yellow-600">${cacheStats.newestEntry ? cacheStats.newestEntry.toLocaleDateString() : 'N/A'}</p>
+            </div>
+          </div>
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="bg-blue-50 p-6 rounded-lg">
             <h3 class="text-lg font-semibold text-blue-800">Total Views</h3>
