@@ -33,6 +33,16 @@ Key requirements:
      1960 - Second major event
      1970 - Another key milestone
      :::
+   - Vessel diagrams with format:
+     :::vessel-diagram:::
+     container|tanker|bulker
+     :::
+   - Port layouts with format:
+     :::port-layout:::
+   - Equipment schematics with format:
+     :::equipment-schematic:::
+     radar|engine|propulsion
+     :::
    - Feature highlights with :::features:::
      Feature 1 with details
      Feature 2 with explanation
