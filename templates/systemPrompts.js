@@ -52,6 +52,12 @@ Key requirements:
      Feature 2 with explanation
      Feature 3 with benefits
      :::
+   - Flashcard review with format:
+     :::flashcards:::
+     What is a nautical mile?|A unit of measurement equal to 1.852 kilometers
+     What is a knot?|One nautical mile per hour
+     What is draft?|The vertical distance between the waterline and the bottom of the hull
+     :::
 5. Include real-world examples and case studies
 6. Add "Related Topics" section with at least 5 internal links (always starting with /)
 7. Include relevant hashtags for social sharing`
