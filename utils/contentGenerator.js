@@ -96,11 +96,17 @@ const processCustomBlocks = (content) => {
   processedContent = processedContent.replace(/:::draft-calculator:::/g, () => createDraftCalculator());
 
   // Process visual blocks
-  processedContent = processedContent.replace(/:::vessel-diagram:::([\s\S]*?):::/g, (match, type) => 
-    createVesselDiagram(type.trim()));
+  processedContent = processedContent.replace(/:::vessel-diagram:::([\s\S]*?):::/g, (match, content) => {
+    const typeMatch = content.match(/type:\s*(\w+)/);
+    const type = typeMatch ? typeMatch[1] : 'container';
+    return createVesselDiagram(type);
+  });
   processedContent = processedContent.replace(/:::port-layout:::/g, () => createPortLayout());
-  processedContent = processedContent.replace(/:::equipment-schematic:::([\s\S]*?):::/g, (match, equipment) => 
-    createEquipmentSchematic(equipment.trim()));
+  processedContent = processedContent.replace(/:::equipment-schematic:::([\s\S]*?):::/g, (match, content) => {
+    const typeMatch = content.match(/type:\s*(\w+)/);
+    const equipment = typeMatch ? typeMatch[1] : 'radar';
+    return createEquipmentSchematic(equipment);
+  });
 
   // Process timeline blocks first
   processedContent = processedContent.replace(/:::timeline:::([\s\S]*?):::/g, (match, content) => {
