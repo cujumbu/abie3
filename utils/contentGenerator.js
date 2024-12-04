@@ -7,6 +7,7 @@ import { createChart } from './components/chart.js';
 import { createFeatures } from './components/features.js';
 import { createTimeline } from './components/timeline.js';
 import { createFlashcards } from './components/flashcards.js';
+import { createFlashcards } from './components/flashcards.js';
 import { createSpeedCalculator, createUnitConverter, createFuelCalculator, createDraftCalculator } from './components/maritimeCalculators.js';
 import { createVesselDiagram, createPortLayout, createEquipmentSchematic } from './components/maritimeVisuals.js';
 import { siteContext } from '../config/siteContext.js';
@@ -120,6 +121,13 @@ const processCustomBlocks = (content, currentPath) => {
   // Process calculator blocks
   processedContent = processedContent.replace(/:::speed-calculator:::/g, () => createSpeedCalculator());
   processedContent = processedContent.replace(/:::unit-converter:::/g, () => createUnitConverter());
+  processedContent = processedContent.replace(/:::flashcards:::([\s\S]*?):::/g, (match, content) => {
+    const cards = content.trim().split('\n').map(line => {
+      const [question, answer] = line.split('|').map(s => s.trim());
+      return { question, answer };
+    });
+    return createFlashcards(cards);
+  });
   processedContent = processedContent.replace(/:::flashcards:::([\s\S]*?):::/g, (match, content) => {
     const cards = content.trim().split('\n').map(line => {
       const [question, answer] = line.split('|').map(s => s.trim());
