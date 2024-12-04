@@ -65,15 +65,22 @@ export class SupabaseCache {
   }
 
   async getStats() {
-    const { count, error } = await supabase
+    const { data, error } = await supabase
       .from(this.tableName)
-      .select('*', { count: 'exact' });
+      .select('*');
 
     if (error) {
       console.error('Cache stats error:', error);
       return { keys: 0 };
     }
 
-    return { keys: count || 0 };
+    const totalSize = data.reduce((acc, entry) => acc + entry.content.length, 0);
+    
+    return {
+      keys: data.length,
+      totalSize: (totalSize / 1024 / 1024).toFixed(2), // Size in MB
+      oldestEntry: data.length > 0 ? new Date(Math.min(...data.map(e => new Date(e.created_at)))) : null,
+      newestEntry: data.length > 0 ? new Date(Math.max(...data.map(e => new Date(e.created_at)))) : null
+    };
   }
 }
