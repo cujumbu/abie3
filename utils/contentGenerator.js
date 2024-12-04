@@ -86,7 +86,7 @@ const processRelatedTopics = (content) => {
   return content;
 };
 
-const processCustomBlocks = (content) => {
+const processCustomBlocks = (content, path) => {
   let processedContent = content;
 
   // Helper function to determine diagram type based on path and content
