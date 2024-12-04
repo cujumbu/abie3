@@ -7,6 +7,39 @@ import { createFeatures } from './components/features.js';
 import { styles } from './components/styles.js';
 import { siteContext } from '../config/siteContext.js';
 
+const createAdminTemplate = (content, { title }) => `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | ${title}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <nav class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 py-3">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center">
+                        <span class="text-xl font-semibold text-gray-900">Admin Dashboard</span>
+                    </div>
+                    <div>
+                        <a href="/" class="text-gray-500 hover:text-gray-700">Back to Site</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="max-w-7xl mx-auto py-6 px-4">
+            <div class="bg-white shadow rounded-lg p-6">
+                ${content}
+            </div>
+        </main>
+    </div>
+</body>
+</html>`;
+
 // Configure marked options
 marked.setOptions({
   gfm: true,
@@ -151,10 +184,8 @@ const createHeader = () => {
           </div>
 
           <div class="flex items-center">
-            <a href="${site.navigation.cta.href}" 
-               class="px-6 py-2 rounded-lg text-white font-medium transition-colors duration-200"
-               style="background-color: ${site.theme.primary}; hover:background-color: ${site.theme.secondary}">
-              ${site.navigation.cta.text}
+            <a href="/maritime-industry-developments" class="px-6 py-2 rounded-lg text-white font-medium bg-blue-600 hover:bg-blue-700 transition-colors duration-200">
+              Industry Insights
             </a>
           </div>
         </div>
@@ -272,6 +303,11 @@ const template = `<!DOCTYPE html>
 export const createHtmlPage = (content, { title }) => {
   const processedContent = processCustomBlocks(content);
   const htmlContent = marked.parse(processedContent);
+  
+  // Use admin template for admin routes
+  if (title === 'Analytics Dashboard') {
+    return createAdminTemplate(htmlContent, { title });
+  }
   
   return template
     .replace(/{{title}}/g, title || 'Generated Content')
