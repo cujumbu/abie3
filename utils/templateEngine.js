@@ -141,20 +141,20 @@ const createHeader = () => {
         <div class="flex justify-between h-20">
           <a href="/" class="flex items-center space-x-2">
             ${logo}
-            <span class="text-2xl font-bold text-blue-600">${site.logo.text}</span>
+            <span class="text-2xl font-bold" style="color: ${site.theme.primary}">${site.logo.text}</span>
           </a>
 
           <div class="hidden md:flex items-center space-x-8">
-            <a href="/maritime-history-and-heritage" class="font-medium text-gray-900 hover:text-blue-600">Historical</a>
-            <a href="/modern-navigation-systems" class="font-medium text-gray-900 hover:text-blue-600">Navigation</a>
-            <a href="/marine-research-and-development" class="font-medium text-gray-900 hover:text-blue-600">Research</a>
-            <a href="/maritime-technology-innovations" class="font-medium text-gray-900 hover:text-blue-600">Technology</a>
-            <a href="/naval-engineering-advances" class="font-medium text-gray-900 hover:text-blue-600">Engineering</a>
+            ${site.navigation.primary.map(item => 
+              `<a href="${item.href}" class="font-medium text-gray-900 hover:text-blue-600 transition-colors">${item.text}</a>`
+            ).join('')}
           </div>
 
           <div class="flex items-center">
-            <a href="/maritime-industry-developments" class="px-6 py-2 rounded-lg text-white font-medium bg-blue-600 hover:bg-blue-700 transition-colors duration-200">
-              Industry Insights
+            <a href="${site.navigation.cta.href}" 
+               class="px-6 py-2 rounded-lg text-white font-medium transition-colors duration-200"
+               style="background-color: ${site.theme.primary}; hover:background-color: ${site.theme.secondary}">
+              ${site.navigation.cta.text}
             </a>
           </div>
         </div>
